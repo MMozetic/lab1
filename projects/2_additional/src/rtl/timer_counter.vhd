@@ -34,11 +34,50 @@ ARCHITECTURE rtl OF timer_counter IS
 SIGNAL counter_value_s   : STD_LOGIC_VECTOR(7 DOWNTO 0);
 SIGNAL counter_for_min_s : STD_LOGIC_VECTOR(7 DOWNTO 0);
 SIGNAL counter_for_h_s   : STD_LOGIC_VECTOR(7 DOWNTO 0);
+SIGNAL counter_value_r   : STD_LOGIC_VECTOR(7 DOWNTO 0);
 begin
 
 -- DODATI :
 
 -- sistem za brojane sekundi,minuta i sata kao sistem za generisanje izlaza u odnosu na pritisnuti taster
 -- ako nije pritisnut nijedan taster onda se prikazuju sekunde
+process(rst_i,clk_i)begin
+		if(rst_i = '1')then
+			counter_value_r <= (others => '0');
+		elsif(clk_i'event and clk_i='1')then
+			if(cnt_rst_i='1')then
+				counter_value_r <= (others => '0');
+			elsif(cnt_en_i = '1')then
+				if(one_sec_i = '1')then
+					if(counter_value_r = 99)then
+						counter_value_r <= (others => '0');
+					else
+						counter_value_r <= counter_value_r + 1;
+					end if;
+				else
+					counter_value_r <= counter_value_r;		
+				end if;		
+			else
+				counter_value_r <= counter_value_r;
+			end if;	
+		end if;
+end process;
+
+process(button_min_i, button_hour_i)begin
+	if(button_min_i = '1')then
+		
+	elsif(button_hour_i = '1')then
+		if(counter_for_min_s = 59)then
+	else 
+		if(counter_value_r = 99)then
+			counter_value_r = (others => '0');
+		else
+			counter_value_r <= counter_value_r + 1;
+		end if;
+	end if;
+end process;
+
+led_o <= counter_value_r;
+
 
 END rtl;
